@@ -1,4 +1,4 @@
-const Cart = require("../models/Cart");
+const Cart = require("../models/cart");
 
 exports.getCart = async (req, res) => {
     try {
@@ -12,7 +12,7 @@ exports.getCart = async (req, res) => {
 
 exports.addToCart = async (req, res) => {
     try {
-        const { userId, products } = req.body; // ✅ Lấy mảng products từ body
+        const { userId, products } = req.body; 
 
         if (!userId || !products || !products.length) {
             return res.status(400).json({ message: "userId và danh sách sản phẩm là bắt buộc" });

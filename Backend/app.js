@@ -10,6 +10,8 @@ const productRoutes = require('./router/productRouter');
 const authRoutes = require('./router/authRouter');
 const orderRoutes = require('./router/orderRouter');
 const cartRouter = require('./router/cartRouter');
+const potRoutes = require('./router/potRouter');
+const accessoryRoutes = require('./router/accessoryRouter');
 
 var app = express();
 
@@ -35,6 +37,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRouter);
+app.use('/api/pots', potRoutes);
+app.use('/api/accessories', accessoryRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -42,7 +46,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = 4000;
 app.listen(PORT, () => {
-    console.log(`Server chạy tại http://172.16.51.242:${PORT}`);
+    console.log(`Server chạy tại http://192.168.1.6:${PORT}`);
 });
 
 // Xử lý lỗi 404

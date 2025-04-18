@@ -1,4 +1,4 @@
-const API_URL = "http://172.16.51.242:4000/api/products/list";
+const API_URL = "http://192.168.1.6:4000/api/products/list";
 
 export async function getProducts() {
     try {

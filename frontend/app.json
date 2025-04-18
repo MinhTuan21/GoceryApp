@@ -2,6 +2,12 @@
   "expo": {
     "name": "frontend",
     "slug": "frontend",
+    "scheme": "frontend",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,6 +22,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.tuan.loginGG",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -23,6 +30,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1dc97a96-5ac2-4a90-82e2-37324fb9406c"
+      }
+    },
+    "owner": "minhtuan21a"
   }
 }

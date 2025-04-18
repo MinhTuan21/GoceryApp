@@ -1,88 +1,178 @@
 import React, { useEffect } from "react";
 import {
-    View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, StyleSheet
+  View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../store/productSlice";
-import { addToCart } from "../store/cartSlice"; // Import Redux action
+import { fetchPots } from "../store/potSlice";
+import { fetchAccessories } from "../store/accessorySlice";
+import { addToCart } from "../store/cartSlice";
 import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 
 const HomeScreen = ({ navigation }) => {
-    const dispatch = useDispatch();
-    const { items: products, loading } = useSelector((state) => state.products);
-    const totalItems = useSelector((state) => state.cart.totalItems); 
+  const dispatch = useDispatch();
+  const { items: products, loading: loadingProducts } = useSelector((state) => state.products);
+  const { items: pots, loading: loadingPots } = useSelector((state) => state.pots);
+  const { items: accessories, loading: loadingAccessories } = useSelector((state) => state.accessories);
+  const totalItems = useSelector((state) => state.cart.totalItems);
 
-    useEffect(() => {
-        dispatch(fetchProducts());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchPots());
+    dispatch(fetchAccessories());
+  }, [dispatch]);
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Planta - toả sáng không gian nhà bạn</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("CartScreen")} style={{ position: "relative" }}>
-                    <Ionicons name="cart-outline" size={28} color="black" />
-                    {totalItems > 0 && (
-                        <View style={styles.cartBadge}>
-                            <Text style={styles.cartText}>{totalItems}</Text>
-                        </View>
-                    )}
-                </TouchableOpacity>
-            </View>
+  const renderGridItems = (data, onPress) => (
+    <View style={styles.gridContainer}>
+      {data.map((item) => (
+        <TouchableOpacity key={item._id} style={styles.productCard} onPress={() => onPress(item)}>
+          <Image source={{ uri: `http://192.168.1.6:4000${item.image}` }} style={styles.image} />
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.price}>{item.price}đ</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
-            <Text style={styles.sectionTitle}>Cây trồng</Text>
-
-          
-            {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-                <FlatList
-                    data={products}
-                    keyExtractor={(item) => item._id}
-                    numColumns={2}
-                    columnWrapperStyle={styles.row}
-                    renderItem={({ item }) => (
-                        <View style={styles.productCard}>
-                            <Image source={{ uri: `http://172.16.51.242:4000${item.image}` }} style={styles.image} />
-                            <Text style={styles.name}>{item.name}</Text>
-                            <Text style={styles.price}>{item.price} VNĐ</Text>
-                            <TouchableOpacity 
-                                style={styles.button} 
-                                onPress={() => dispatch(addToCart(item))} 
-                            >
-                                <Text style={styles.buttonText}>Thêm vào giỏ</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                />
-            )}
-            <View style={styles.navBar}>
-                <Ionicons name="home" size={28} color="black" />
-                <Ionicons name="search" size={28} color="black" />
-                <Ionicons name="notifications-outline" size={28} color="black" />
-                <Ionicons name="person-outline" size={28} color="black" />
-            </View>
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <View style={styles.headerTextWrapper}>
+          <Text style={styles.headerTitle}>Planta - toả sáng không gian nhà bạn</Text>
+          <TouchableOpacity onPress={() => {}} style={styles.viewNewBtn}>
+            <Text style={styles.viewNewText}>Xem hàng mới về</Text>
+            <Ionicons name="arrow-forward" size={16} color="#4CAF50" />
+          </TouchableOpacity>
         </View>
-    );
+        <Image source={require("../assets/images/login.png")} style={styles.headerImage} />
+        <TouchableOpacity onPress={() => navigation.navigate("CartScreen")} style={styles.cartIcon}>
+          <Ionicons name="cart-outline" size={28} color="black" />
+          {totalItems > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartText}>{totalItems}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+      
+        <Text style={styles.sectionTitle}>Cây trồng</Text>
+        {loadingProducts ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          renderGridItems(products, (item) => navigation.navigate("ProductDetail", { product: item }))
+        )}
+        <Text style={styles.sectionTitle}>Chậu cây</Text>
+        {loadingPots ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          renderGridItems(pots, (item) => navigation.navigate("PotDetail", { pot: item }))
+        )}
+        <Text style={styles.sectionTitle}>Phụ kiện</Text>
+        {loadingAccessories ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          renderGridItems(accessories, (item) => navigation.navigate("AccessoryDetail", { accessory: item }))
+        )}
+      </ScrollView>
+
+    
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Ionicons name="home" size={28} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("SearchScreen")}>
+          <Ionicons name="search" size={28} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("NotificationScreen")}>
+          <Ionicons name="notifications-outline" size={28} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
+          <Ionicons name="person-outline" size={28} color="black" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-    header: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16,  marginTop:30 },
-    headerTitle: { fontSize: 18, fontWeight: "bold", flex: 1 },
-    sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 16 },
-    row: { justifyContent: "space-between" },
-    productCard: { width: "48%", padding: 10, borderWidth: 1, borderRadius: 8, borderColor: "#ddd", marginBottom: 10 },
-    image: { width: "100%", height: 120, resizeMode: "cover", borderRadius: 8 },
-    name: { fontSize: 16, fontWeight: "bold", marginTop: 8 },
-    price: { fontSize: 14, color: "green", marginTop: 4 },
-    button: { marginTop: 10, backgroundColor: "#008CBA", padding: 8, borderRadius: 5, alignItems: "center" },
-    buttonText: { color: "#fff", fontWeight: "bold" },
-    navBar: { flexDirection: "row", justifyContent: "space-around", padding: 10, borderTopWidth: 1, borderColor: "#ddd" },
-    cartBadge: { position: "absolute", top: -5, right: -5, backgroundColor: "red", borderRadius: 10, paddingHorizontal: 6 },
-    cartText: { color: "white", fontSize: 12, fontWeight: "bold" },
+  container: { flex: 1, backgroundColor: "#fff" },
+
+  headerContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F2F3F4",
+    padding: 16,
+    paddingTop: 50,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    position: "relative",
+  },
+  headerTextWrapper: { flex: 1, marginRight: 8 },
+  headerTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
+  viewNewBtn: { flexDirection: "row", alignItems: "center" },
+  viewNewText: { color: "#4CAF50", fontWeight: "500", marginRight: 4 },
+  headerImage: { width: 100, height: 100, resizeMode: "contain" },
+  cartIcon: { position: "absolute", top: 50, right: 16 },
+  cartBadge: {
+    position: "absolute",
+    top: -5,
+    right: -10,
+    backgroundColor: "red",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  cartText: { color: "white", fontSize: 12, fontWeight: "bold" },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginHorizontal: 16,
+    marginTop: 24,
+    marginBottom: 12,
+  },
+
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  productCard: {
+    width: "48%",
+    marginBottom: 16,
+  },
+  image: {
+    width: "100%",
+    height: 140,
+    borderRadius: 10,
+    resizeMode: "cover",
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginTop: 6,
+  },
+  price: {
+    fontSize: 14,
+    color: "green",
+    fontWeight: "500",
+    marginTop: 2,
+  },
+
+  navBar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 12,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
 });
 
 export default HomeScreen;
